@@ -18,22 +18,23 @@ void *do_something(void *id)
     init_ttas_local(*my_core, &my_data);
     
     int count = 0;
-    int i = 10000;
+    int j = 10000,i;
     clock_t begin, end;
     double time_spent = 0;
     
     begin = clock();
-    while(i > 0){
-        ttas_lock(the_lock,&my_data);
-		ttas_unlock(the_lock);        	
-        i--;       
+    while(j > 0){
+        for(i =0; i<10000; i++){
+            count = count + i;
+        }        	
+        j--;       
     }
     end = clock();
     time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
     /*free internal memory structures which may have been allocated for the local data*/
     end_ttas_local(my_data);
     printf("time: %lf\n", time_spent);
-
+    printf("%d\n", count);
     return NULL;
 
 }
