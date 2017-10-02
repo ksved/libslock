@@ -24,7 +24,8 @@ void *do_something(void *id)
     
     begin = clock();
     while(i > 0){
-        printf("%d\n", *my_core);        	
+        ttas_lock(the_lock,&my_data);
+		ttas_unlock(the_lock);        	
         i--;       
     }
     end = clock();
