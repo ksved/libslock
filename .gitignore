@@ -88,3 +88,5 @@
 /test_correctness_ttass
 /trylock_test
 /uncontended
+temp
+out
