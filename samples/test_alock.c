@@ -4,18 +4,18 @@
 #define NUM_THREADS 28
 
 #include "../include/atomic_ops.h" //the memory barriers are defined there
-#include "../include/mcs.h"
+#include "../include/alock.h"
 
 /* global data */
-mcs_global_params the_lock;
+lock_shared_t the_lock;
 
 void *do_something(void *id)
 {
     int* my_core = (int*) id; 
     /* local data */
-    mcs_local_params my_data;
+    array_lock_t local_lock;
     /*initialize this thread's local data*/
-    init_mcs_local(*my_core, &my_data);
+    init_alock_local(*my_core, &the_lock, &local_lock);
     
     int count = 0;
     int i;
@@ -33,7 +33,7 @@ void *do_something(void *id)
         
         begin = clock();
         /*acquire the lock*/
-        mcs_acquire(the_lock.the_lock,my_data);
+        alock_lock(&local_lock);
         end = clock();
         
         for(i =0; i<10000; i++){
@@ -41,7 +41,7 @@ void *do_something(void *id)
         }
 		
 		/*release the lock*/
-        mcs_release(the_lock.the_lock,my_data);
+        alock_unlock(&local_lock);
         time_spent = time_spent + (double)(end - begin);
         j--;
     }
@@ -49,7 +49,7 @@ void *do_something(void *id)
     time_spent = (double) time_spent /  (CLOCKS_PER_SEC * 10000);
     printf("%d\t%lf\t%d\n", *my_core, time_spent, count);
     /*free internal memory structures which may have been allocated for the local data*/
-    end_mcs_local(my_data);
+    end_alock_local(local_lock);
 
     return NULL;
 
@@ -61,13 +61,12 @@ int main(int argc, char *argv[])
     long t;
 
     /*initialize the global data*/
-    init_mcs_global(&the_lock); 
+    init_alock_global(NUM_THREADS, &the_lock); 
     int ids[]= { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27 };
 
     MEM_BARRIER;
 
     for(t=0;t<NUM_THREADS;t++){
-        printf("In main: creating thread %ld\n", t);
         if (pthread_create(&threads[t], NULL, *do_something, &ids[t])!=0){
             fprintf(stderr,"Error creating thread\n");
             exit(-1);
@@ -82,7 +81,7 @@ int main(int argc, char *argv[])
     }
 
     /*free internal memory strucutres which may have been allocated for this lock */
-    end_mcs_global(the_lock);
+    end_alock_global(the_lock);
 
     pthread_exit(NULL);
 }
