@@ -113,7 +113,7 @@ void end_clh_array_global(clh_global_params* the_locks, uint32_t size) {
     free(the_locks);
 }
 
-int init_clh_global(clh_global_params* the_params) {
+int init_clh_global(clh_global_params* the_params) {	
     the_params->the_lock=(clh_lock*)malloc(sizeof(clh_lock));
     clh_qnode * a_node = (clh_qnode *) malloc(sizeof(clh_qnode));
     a_node->locked=0;
