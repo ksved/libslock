@@ -1,7 +1,7 @@
 cd 'C:\Users\kruthika\Documents\libslock\plotting'
 set terminal png
-set output 'tas_test.png'
+set output 'spinlock_test.png'
 set boxwidth 0.75
-set title 'TAS How much time does it take to acquire lock?'
+set title 'SPINLOCK How much time does it take to acquire lock?'
 set style fill solid
-plot "< sort -kn1nr out.dat" using 2:xtic(1) with boxes
+plot "out.dat" using 2:xtic(1) with boxes
