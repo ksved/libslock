@@ -1,7 +1,21 @@
 cd 'C:\Users\kruthika\Documents\libslock\plotting'
 set terminal png
-set output 'spinlock_test.png'
+set output 'mcs_28_1.png'
 set boxwidth 0.75
-set title 'SPINLOCK How much time does it take to acquire lock?'
+set title 'MCS with 28 threads'
 set style fill solid
-plot "out.dat" using 2:xtic(1) with boxes
+plot "out_28_mcs.dat" using 2:xtic(1) with boxes
+
+
+
+set style histogram clustered
+
+set boxwidth 1set style fill solid
+
+set term png
+
+set output "so.png"
+
+plot [-0.5:2.75][1:17] "so.dat" using 2:xtic(2) title "TAS" with histograms, \
+
+"" using 3 title "MCS" with histograms 

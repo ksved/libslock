@@ -30,7 +30,7 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
-#define NUM_THREADS 28
+#define NUM_THREADS 14
 
 #include "lock_if.h"
 #include "atomic_ops.h"
@@ -50,33 +50,33 @@ void *do_something(void *id)
     int i;
     int j = 10000;
     clock_t begin, end;
-    double time_spent = 0;
+    double time_spent = 0, time_spent_t;
     
 	MEM_BARRIER;
 
-    while(j > 0){
-         
-        for(i =0; i<10000; i++){
-            count = count + i;
-        }
-        
+    while(time_spent_t < 1){
+            
         begin = clock();
     	/*acquire the lock*/
-    	acquire_lock(&my_data,&the_lock);
-    	end = clock();
+    	acquire_lock(&my_data,&the_lock);    	
         
-        for(i =0; i<10000; i++){
-            count = count - i;
-        }
+        count++;
 		
     	/*release the lock*/
     	release_lock(&my_data,&the_lock);
-		time_spent = time_spent + (double)(end - begin);
+    	
+		end = clock();
         j--;
+        time_spent = time_spent + (double)(end - begin);
+        time_spent_t = (double) time_spent /  (CLOCKS_PER_SEC);
+        //for(i =0; i<9998; i++){
+//            count = count + i;
+//        }
+        
     }
-
-    time_spent = (double) time_spent /  (CLOCKS_PER_SEC * 10000);
-    printf("%d\t%lf\t%d\n", *my_core, time_spent, count);
+    
+    
+    printf("%d\t%d\n", *my_core, count);
     
     /*free internal memory structures which may have been allocated for the local data*/
     free_lock_local(my_data);
@@ -92,7 +92,8 @@ int main(int argc, char *argv[])
 
     /*initialize the global data*/
     init_lock_global(&the_lock); 
-    int ids[]= { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27 };
+    int ids[]= { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 };
+
 
     MEM_BARRIER;
 
